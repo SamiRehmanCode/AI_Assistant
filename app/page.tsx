@@ -30,6 +30,9 @@ export default function Home() {
     }
   }, [sessions.length, createSession]);
 
+  if (!process.env.API_KEY) {
+    console.log("hello", process.env.HELLO);
+  }
   return (
     <div className="flex h-screen bg-black text-white">
       {/* Sidebar */}
