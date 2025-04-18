@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import SidebarNav from "@/components/sidebar-nav"
-import BotSelector from "@/components/bot-selector"
-import ChatInput from "@/components/chat-input"
-import ChatHistory from "@/components/chat-history"
-import { useChatStore } from "@/hooks/use-chat-store"
-import { useEffect } from "react"
+import Image from "next/image";
+import SidebarNav from "@/components/sidebar-nav";
+import BotSelector from "@/components/bot-selector";
+import ChatInput from "@/components/chat-input";
+import ChatHistory from "@/components/chat-history";
+import { useChatStore } from "@/hooks/use-chat-store";
+import { useEffect } from "react";
 
 export default function Home() {
   const {
@@ -21,14 +21,14 @@ export default function Home() {
     selectSession,
     changeModel,
     toggleSidebar,
-  } = useChatStore()
+  } = useChatStore();
 
   // Create a session if none exists
   useEffect(() => {
     if (sessions.length === 0) {
-      createSession()
+      createSession();
     }
-  }, [sessions.length, createSession])
+  }, [sessions.length, createSession]);
 
   return (
     <div className="flex h-screen bg-black text-white">
@@ -62,12 +62,18 @@ export default function Home() {
               </div>
 
               {/* Bot Selector */}
-              <BotSelector activeModel={activeModel} onSelectModel={changeModel} />
+              <BotSelector
+                activeModel={activeModel}
+                onSelectModel={changeModel}
+              />
             </>
           ) : (
-            <div className="flex-1 overflow-hidden py-2 sm:py-4">
+            <div className="flex-1 overflow-y-auto py-2 sm:py-4">
               {/* Chat History */}
-              <ChatHistory messages={currentSession.messages} activeModel={activeModel} />
+              <ChatHistory
+                messages={currentSession.messages}
+                activeModel={activeModel}
+              />
             </div>
           )}
 
@@ -81,14 +87,20 @@ export default function Home() {
             <div className="w-full mb-6 sm:mb-8">
               <div className="flex justify-between items-center mb-3 sm:mb-4 px-2">
                 <h2 className="text-lg sm:text-xl font-bold">Official bots</h2>
-                <a href="#" className="text-purple-400 hover:underline text-sm sm:text-base">
+                <a
+                  href="#"
+                  className="text-purple-400 hover:underline text-sm sm:text-base"
+                >
                   See all
                 </a>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 px-2">
                 {/* Bot placeholders */}
                 {[1, 2, 3, 4].map((bot) => (
-                  <div key={bot} className="h-16 sm:h-24 bg-gray-800 rounded-lg"></div>
+                  <div
+                    key={bot}
+                    className="h-16 sm:h-24 bg-gray-800 rounded-lg"
+                  ></div>
                 ))}
               </div>
             </div>
@@ -96,5 +108,5 @@ export default function Home() {
         </div>
       </main>
     </div>
-  )
+  );
 }
