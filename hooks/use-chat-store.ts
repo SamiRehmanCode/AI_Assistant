@@ -6,10 +6,7 @@ import { createChatSession, createMessage } from "@/lib/chat-utils";
 const { OpenAI } = require("openai");
 
 const openai = new OpenAI({
-  apiKey:
-    "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",
-
-  dangerouslyAllowBrowser: true,
+  apiKey: process.env.key,
 });
 
 async function chatWithGPT(input: string, model: string) {
