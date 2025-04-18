@@ -6,8 +6,7 @@ import { createChatSession, createMessage } from "@/lib/chat-utils";
 const { OpenAI } = require("openai");
 
 const openai = new OpenAI({
-  apiKey:
-    "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",
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
 
   dangerouslyAllowBrowser: true,
 });
