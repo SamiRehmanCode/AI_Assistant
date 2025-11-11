@@ -38,7 +38,7 @@ export function useChatStore() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [activeModel, setActiveModel] = useState<string>("gpt-3.5-turbo");
   const [isLoading, setIsLoading] = useState(false);
-  const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const currentSession = useCallback(() => {
     return sessions.find((s) => s.id === currentSessionId) || null;

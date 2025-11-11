@@ -1,6 +1,6 @@
 import type { ChatMessage as ChatMessageType } from "@/types/chat";
 import { formatDistanceToNow } from "date-fns";
-import Image from "next/image";
+import { Bot, User } from "lucide-react";
 
 interface ChatHistoryProps {
   messages: ChatMessageType[];
@@ -12,78 +12,59 @@ export default function ChatHistory({
   activeModel,
 }: ChatHistoryProps) {
   if (messages.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-gray-400">
-        <p>Start a conversation with {activeModel}</p>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="flex flex-col space-y-4 py-4 overflow-y-auto">
-      {messages.map((message) => (
-        <ChatMessage key={message.id} message={message} />
-      ))}
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="space-y-6">
+        {messages.map((message) => (
+          <ChatMessage key={message.id} message={message} />
+        ))}
+      </div>
     </div>
   );
 }
 
-// Update the ChatMessage component to be more responsive
 function ChatMessage({ message }: { message: ChatMessageType }) {
   const isUser = message.role === "user";
 
   return (
-    <div
-      className={`flex ${
-        isUser ? "justify-end" : "justify-start"
-      } px-2 sm:px-4`}
-    >
-      <div
-        className={`flex max-w-[85%] sm:max-w-[80%] ${
-          isUser ? "flex-row-reverse" : "flex-row"
-        }`}
-      >
+    <div className={`flex gap-4 ${isUser ? "justify-end" : "justify-start"}`}>
+      {!isUser && (
+        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
+          <Bot className="w-5 h-5 text-white" />
+        </div>
+      )}
+
+      <div className={`flex flex-col max-w-[75%] ${isUser ? "items-end" : "items-start"}`}>
         <div
-          className={`flex-shrink-0 h-6 w-6 sm:h-8 sm:w-8 rounded-full flex items-center justify-center ${
-            isUser ? "bg-purple-600 ml-2" : "bg-gray-700 mr-2"
+          className={`px-4 py-3 rounded-2xl ${
+            isUser
+              ? "bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white"
+              : "bg-slate-800/50 border border-slate-700/50 text-slate-100"
           }`}
         >
-          {isUser ? (
-            <span className="text-xs sm:text-sm font-bold">U</span>
+          {message.pending ? (
+            <div className="flex space-x-2 items-center py-1">
+              <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+              <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+            </div>
           ) : (
-            <Image
-              src="/placeholder.svg?height=20&width=20"
-              alt="Bot"
-              width={16}
-              height={16}
-              className="sm:w-5 sm:h-5"
-            />
+            <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
           )}
         </div>
-
-        <div
-          className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}
-        >
-          <div
-            className={`px-3 py-2 sm:px-4 sm:py-2 rounded-lg ${
-              isUser ? "bg-purple-600" : "bg-gray-800"
-            } overflow-auto max-h-40`}
-          >
-            {message.pending ? (
-              <div className="flex space-x-1 items-center h-5 sm:h-6">
-                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-pulse delay-75"></div>
-                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
-              </div>
-            ) : (
-              <p className="text-xs sm:text-sm">{message.content}</p>
-            )}
-          </div>
-          <span className="text-[10px] sm:text-xs text-gray-500 mt-1">
-            {formatDistanceToNow(message.timestamp, { addSuffix: true })}
-          </span>
-        </div>
+        <span className="text-xs text-slate-500 mt-1.5 px-1">
+          {formatDistanceToNow(message.timestamp, { addSuffix: true })}
+        </span>
       </div>
+
+      {isUser && (
+        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center">
+          <User className="w-5 h-5 text-slate-300" />
+        </div>
+      )}
     </div>
   );
 }

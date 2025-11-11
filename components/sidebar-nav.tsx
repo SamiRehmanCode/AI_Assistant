@@ -1,8 +1,6 @@
 "use client"
 
-import { Search, Plus, Users, User, Settings, Send, Star } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
+import { Plus, MessageSquare, Trash2, Sparkles } from "lucide-react"
 import type { ChatSession } from "@/types/chat"
 import { getChatSummary } from "@/lib/chat-utils"
 import { formatDistanceToNow } from "date-fns"
@@ -26,127 +24,106 @@ export default function SidebarNav({
 }: SidebarNavProps) {
   return (
     <>
-      {/* Mobile sidebar toggle button - visible only on small screens */}
-      <button onClick={onToggle} className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-md">
-        <div className="w-5 h-0.5 bg-white mb-1"></div>
-        <div className="w-5 h-0.5 bg-white mb-1"></div>
-        <div className="w-5 h-0.5 bg-white"></div>
-      </button>
-
-      {/* Sidebar - conditionally shown based on isVisible state */}
+      {/* Sidebar */}
       <div
-        className={`${isVisible ? "translate-x-0" : "-translate-x-full"} 
-        lg:translate-x-0 fixed lg:static z-40 w-[280px] lg:w-[350px] h-full bg-black 
-        border-r border-gray-800 flex flex-col transition-transform duration-300 ease-in-out`}
+        className={`${
+          isVisible ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0 fixed lg:static z-40 w-72 h-full bg-slate-900/50 backdrop-blur-xl border-r border-slate-800/50 flex flex-col transition-transform duration-300 ease-in-out`}
       >
         {/* Header */}
-        <div className="p-4 flex items-center justify-between border-b border-gray-800">
-          <div className="flex items-center">
-            <Image src="/placeholder.svg?height=30&width=30" alt="Poe Logo" width={30} height={30} className="mr-2" />
-            <span className="text-2xl font-bold">Poe</span>
-          </div>
-          <button onClick={onToggle} className="p-2 lg:hidden">
-            <div className="w-6 h-0.5 bg-white mb-1"></div>
-            <div className="w-6 h-0.5 bg-white mb-1"></div>
-            <div className="w-6 h-0.5 bg-white"></div>
-          </button>
-        </div>
-
-        {/* Navigation */}
-        <div className="flex-1 overflow-y-auto">
-          {/* Explore and Create */}
-          <div className="grid grid-cols-2 gap-2 p-4">
-            <Link href="#" className="flex items-center gap-2 bg-gray-900 p-4 rounded-lg">
-              <Search className="w-6 h-6" />
-              <span className="font-medium">Explore</span>
-            </Link>
-            <button onClick={onCreateSession} className="flex items-center gap-2 bg-gray-900 p-4 rounded-lg">
-              <Plus className="w-6 h-6" />
-              <span className="font-medium">Create</span>
+        <div className="p-4 border-b border-slate-800/50">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-lg flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-lg font-semibold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                AI Assistant
+              </span>
+            </div>
+            <button
+              onClick={onToggle}
+              className="lg:hidden p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
+            >
+              <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
 
-          {/* Chat History */}
-          <div className="p-4">
+          <button
+            onClick={onCreateSession}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-lg transition-all text-white font-medium shadow-lg shadow-violet-500/20"
+          >
+            <Plus className="w-5 h-5" />
+            <span>New Chat</span>
+          </button>
+        </div>
+
+        {/* Chat History */}
+        <div className="flex-1 overflow-y-auto p-3">
+          <div className="space-y-1">
             {sessions.length > 0 ? (
               sessions.map((session) => (
                 <div
                   key={session.id}
-                  className={`flex items-start gap-3 p-2 ${
-                    currentSessionId === session.id ? "bg-gray-800" : "hover:bg-gray-800"
-                  } rounded-lg cursor-pointer mb-2`}
+                  className={`group relative flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all ${
+                    currentSessionId === session.id
+                      ? "bg-slate-800/70 border border-violet-500/30"
+                      : "hover:bg-slate-800/30 border border-transparent"
+                  }`}
                   onClick={() => onSelectSession(session.id)}
                 >
-                  <div className="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center">
-                    <Star className="w-5 h-5" />
+                  <div className="flex-shrink-0 mt-0.5">
+                    <MessageSquare className={`w-4 h-4 ${
+                      currentSessionId === session.id ? "text-violet-400" : "text-slate-500"
+                    }`} />
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between">
-                      <h3 className="font-medium">{session.title}</h3>
-                      <span className="text-xs text-gray-400">
-                        {formatDistanceToNow(session.updatedAt, { addSuffix: true })}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-400 truncate">{getChatSummary(session.messages)}</p>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium text-white truncate">{session.title}</h3>
+                    <p className="text-xs text-slate-500 truncate mt-0.5">
+                      {getChatSummary(session.messages) || "No messages yet"}
+                    </p>
+                    <p className="text-xs text-slate-600 mt-1">
+                      {formatDistanceToNow(session.updatedAt, { addSuffix: true })}
+                    </p>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      // Add delete functionality here
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-700/50 rounded transition-all"
+                  >
+                    <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-400" />
+                  </button>
                 </div>
               ))
             ) : (
-              <div className="text-center text-gray-400 py-4">No chats yet. Create a new one!</div>
-            )}
-
-            {sessions.length > 0 && (
-              <Link href="#" className="block text-center text-gray-400 hover:text-white py-2 mt-2">
-                View all
-              </Link>
-            )}
-          </div>
-
-          {/* Bots and Apps */}
-          <div className="p-4 border-t border-gray-800">
-            <Link href="#" className="flex items-center gap-3 p-2 hover:bg-gray-800 rounded-lg">
-              <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center">
-                <div className="w-5 h-5 relative">
-                  <div className="absolute w-2 h-2 bg-white rounded-full top-0 left-0"></div>
-                  <div className="absolute w-2 h-2 bg-white rounded-full top-0 right-0"></div>
-                  <div className="absolute w-2 h-2 bg-white rounded-full bottom-0 left-0"></div>
-                  <div className="absolute w-2 h-2 bg-white rounded-full bottom-0 right-0"></div>
-                </div>
+              <div className="text-center text-slate-500 py-8 px-4">
+                <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p className="text-sm">No conversations yet</p>
+                <p className="text-xs mt-1">Start a new chat to begin</p>
               </div>
-              <span className="font-medium">Bots and apps</span>
-            </Link>
-          </div>
-
-          {/* Creators */}
-          <div className="p-4 border-t border-gray-800">
-            <Link href="#" className="flex items-center gap-3 p-2 hover:bg-gray-800 rounded-lg">
-              <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center">
-                <Users className="w-5 h-5" />
-              </div>
-              <span className="font-medium">Creators</span>
-            </Link>
+            )}
           </div>
         </div>
 
-        {/* Bottom Navigation */}
-        <div className="border-t border-gray-800">
-          <Link href="#" className="flex items-center gap-3 p-4 hover:bg-gray-800">
-            <User className="w-5 h-5" />
-            <span className="font-medium">Profile</span>
-          </Link>
-          <Link href="#" className="flex items-center gap-3 p-4 hover:bg-gray-800">
-            <Settings className="w-5 h-5" />
-            <span className="font-medium">Settings</span>
-          </Link>
-          <Link href="#" className="flex items-center gap-3 p-4 hover:bg-gray-800">
-            <Send className="w-5 h-5" />
-            <span className="font-medium">Send feedback</span>
-          </Link>
+        {/* Footer */}
+        <div className="p-4 border-t border-slate-800/50">
+          <div className="text-xs text-slate-500 text-center">
+            <p>Built with AI assistance</p>
+          </div>
         </div>
       </div>
 
-      {/* Overlay for mobile - only visible when sidebar is open on mobile */}
-      {isVisible && <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30" onClick={onToggle}></div>}
+      {/* Overlay for mobile */}
+      {isVisible && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-30"
+          onClick={onToggle}
+        ></div>
+      )}
     </>
   )
 }

@@ -1,6 +1,7 @@
 "use client"
 
-import Image from "next/image"
+import { ChevronDown } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
 
 interface BotSelectorProps {
   activeModel: string
@@ -8,56 +9,64 @@ interface BotSelectorProps {
 }
 
 export default function BotSelector({ activeModel, onSelectModel }: BotSelectorProps) {
-  const bots = [
-    { id: "Assistant", name: "Assistant", icon: "/placeholder.svg?height=30&width=30", color: "bg-purple-600" },
-    { id: "App-Creator", name: "App-Creator", icon: "/placeholder.svg?height=30&width=30", color: "bg-blue-600" },
-    {
-      id: "Claude-3.7-Sonnet",
-      name: "Claude-3.7-Sonnet",
-      icon: "/placeholder.svg?height=30&width=30",
-      color: "bg-orange-600",
-    },
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  const models = [
+    { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo", description: "Fast and efficient" },
+    { id: "gpt-4", name: "GPT-4", description: "Most capable" },
+    { id: "gpt-4-turbo", name: "GPT-4 Turbo", description: "Advanced reasoning" },
   ]
 
+  const activeModelInfo = models.find((m) => m.id === activeModel) || models[0]
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
   return (
-    <div className="flex justify-center gap-2 mb-8 flex-wrap px-2">
-      {bots.map((bot) => (
-        <div
-          key={bot.id}
-          className={`flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base ${
-            activeModel === bot.id ? "bg-gray-700 ring-2 ring-purple-500" : "bg-gray-800 hover:bg-gray-700"
-          } cursor-pointer transition-all`}
-          onClick={() => onSelectModel(bot.id)}
-        >
-          <div className={`w-6 h-6 sm:w-8 sm:h-8 ${bot.color} rounded-full flex items-center justify-center`}>
-            <Image
-              src={bot.icon || "/placeholder.svg"}
-              alt={bot.name}
-              width={16}
-              height={16}
-              className="sm:w-5 sm:h-5"
-            />
-          </div>
-          <span className="truncate max-w-[100px] sm:max-w-none">{bot.name}</span>
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 rounded-lg transition-colors text-sm"
+      >
+        <span className="text-slate-300">{activeModelInfo.name}</span>
+        <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-64 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden">
+          {models.map((model) => (
+            <button
+              key={model.id}
+              onClick={() => {
+                onSelectModel(model.id)
+                setIsOpen(false)
+              }}
+              className={`w-full px-4 py-3 text-left hover:bg-slate-700/50 transition-colors ${
+                activeModel === model.id ? "bg-slate-700/30" : ""
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-white font-medium text-sm">{model.name}</div>
+                  <div className="text-slate-400 text-xs mt-0.5">{model.description}</div>
+                </div>
+                {activeModel === model.id && (
+                  <div className="w-2 h-2 bg-violet-500 rounded-full"></div>
+                )}
+              </div>
+            </button>
+          ))}
         </div>
-      ))}
-      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center cursor-pointer">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="sm:w-5 sm:h-5"
-        >
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-      </div>
+      )}
     </div>
   )
 }

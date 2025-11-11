@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import SidebarNav from "@/components/sidebar-nav";
 import BotSelector from "@/components/bot-selector";
 import ChatInput from "@/components/chat-input";
 import ChatHistory from "@/components/chat-history";
 import { useChatStore } from "@/hooks/use-chat-store";
 import { useEffect } from "react";
+import { Sparkles } from "lucide-react";
 
 export default function Home() {
   const {
@@ -30,11 +30,8 @@ export default function Home() {
     }
   }, [sessions.length, createSession]);
 
-  if (!process.env.API_KEY) {
-    console.log("hello", process.env.HELLO);
-  }
   return (
-    <div className="flex h-screen bg-black text-white">
+    <div className="flex h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Sidebar */}
       <SidebarNav
         sessions={sessions}
@@ -46,68 +43,82 @@ export default function Home() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden pt-14 lg:pt-0">
-        <div className="w-full max-w-3xl mx-auto flex flex-col h-full px-2 sm:px-4">
+      <main className="flex-1 flex flex-col h-full overflow-hidden">
+        {/* Header */}
+        <header className="border-b border-slate-800/50 backdrop-blur-sm bg-slate-950/50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleSidebar}
+                className="lg:hidden p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-lg flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <h1 className="text-xl font-semibold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                  AI Assistant
+                </h1>
+              </div>
+            </div>
+            <BotSelector activeModel={activeModel} onSelectModel={changeModel} />
+          </div>
+        </header>
+
+        <div className="flex-1 flex flex-col overflow-hidden h-70%">
           {!currentSession || currentSession.messages.length === 0 ? (
-            <>
-              {/* Logo - Show only when no messages */}
-              <div className="mt-8 sm:mt-16 mb-8 sm:mb-12">
-                <div className="flex items-center justify-center">
-                  <Image
-                    src="/placeholder.svg?height=60&width=60"
-                    alt="Poe Logo"
-                    width={40}
-                    height={40}
-                    className="mr-3 sm:mr-4 sm:w-[60px] sm:h-[60px]"
-                  />
-                  <span className="text-4xl sm:text-6xl font-bold">Poe</span>
+            <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pb-27">
+              <div className="text-center max-w-2xl">
+                <div className="mb-6">
+                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-2xl flex items-center justify-center mb-4">
+                    <Sparkles className="w-8 h-8 text-white" />
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+                    How can I help you today?
+                  </h2>
+                  <p className="text-slate-400 text-lg">
+                    Start a conversation and let AI assist you with anything you need.
+                  </p>
+                </div>
+
+                {/* Suggestion Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
+                  {[
+                    { title: "Write code", desc: "Get help with programming tasks" },
+                    { title: "Explain concepts", desc: "Learn something new today" },
+                    { title: "Creative writing", desc: "Generate stories or content" },
+                    { title: "Problem solving", desc: "Work through complex issues" },
+                  ].map((suggestion, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => sendMessage(suggestion.title)}
+                      className="p-4 bg-slate-800/30 hover:bg-slate-800/50 border border-slate-700/50 rounded-xl text-left transition-all hover:border-violet-500/50 group"
+                    >
+                      <div className="text-white font-medium mb-1 group-hover:text-violet-400 transition-colors">
+                        {suggestion.title}
+                      </div>
+                      <div className="text-slate-500 text-sm">{suggestion.desc}</div>
+                    </button>
+                  ))}
                 </div>
               </div>
-
-              {/* Bot Selector */}
-              <BotSelector
-                activeModel={activeModel}
-                onSelectModel={changeModel}
-              />
-            </>
+            </div>
           ) : (
-            <div className="flex-1 overflow-y-auto py-2 sm:py-4">
-              {/* Chat History */}
-              <ChatHistory
-                messages={currentSession.messages}
-                activeModel={activeModel}
-              />
+            <div className="flex-1 overflow-y-auto">
+              <ChatHistory messages={currentSession.messages} activeModel={activeModel} />
             </div>
           )}
 
           {/* Chat Input */}
-          <div className="w-full mb-4 sm:mb-6 mt-auto">
-            <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
-          </div>
-
-          {/* Official Bots Section - Show only when no messages */}
-          {(!currentSession || currentSession.messages.length === 0) && (
-            <div className="w-full mb-6 sm:mb-8">
-              <div className="flex justify-between items-center mb-3 sm:mb-4 px-2">
-                <h2 className="text-lg sm:text-xl font-bold">Official bots</h2>
-                <a
-                  href="#"
-                  className="text-purple-400 hover:underline text-sm sm:text-base"
-                >
-                  See all
-                </a>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 px-2">
-                {/* Bot placeholders */}
-                {[1, 2, 3, 4].map((bot) => (
-                  <div
-                    key={bot}
-                    className="h-16 sm:h-24 bg-gray-800 rounded-lg"
-                  ></div>
-                ))}
-              </div>
+          <div className="border-t border-slate-800/50 bg-slate-950/50 backdrop-blur-sm">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
             </div>
-          )}
+          </div>
         </div>
       </main>
     </div>

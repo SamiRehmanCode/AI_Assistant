@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Assitant Chat",
-  description: "Created with v0",
-  generator: "Personal Assitant",
+  title: "AI Assistant",
+  description: "Your intelligent conversation partner",
+  generator: "AI Assistant",
 };
 
 export default function RootLayout({
@@ -13,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }
