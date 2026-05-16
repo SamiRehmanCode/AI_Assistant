@@ -1,17 +1,18 @@
-"use client"
+"use client";
 
-import { Plus, MessageSquare, Trash2, Sparkles } from "lucide-react"
-import type { ChatSession } from "@/types/chat"
-import { getChatSummary } from "@/lib/chat-utils"
-import { formatDistanceToNow } from "date-fns"
+import { Plus, MessageSquare, Trash2, Sparkles } from "lucide-react";
+import type { ChatSession } from "@/types/chat";
+import { getChatSummary } from "@/lib/chat-utils";
+import { formatDistanceToNow } from "date-fns";
 
 interface SidebarNavProps {
-  sessions: ChatSession[]
-  currentSessionId: string | null
-  onSelectSession: (sessionId: string) => void
-  onCreateSession: () => void
-  isVisible: boolean
-  onToggle: () => void
+  sessions: ChatSession[];
+  currentSessionId: string | null;
+  onSelectSession: (sessionId: string) => void;
+  onCreateSession: () => void | Promise<void>;
+  onDeleteSession: (sessionId: string) => void | Promise<void>;
+  isVisible: boolean;
+  onToggle: () => void;
 }
 
 export default function SidebarNav({
@@ -19,6 +20,7 @@ export default function SidebarNav({
   currentSessionId,
   onSelectSession,
   onCreateSession,
+  onDeleteSession,
   isVisible,
   onToggle,
 }: SidebarNavProps) {
@@ -45,8 +47,18 @@ export default function SidebarNav({
               onClick={onToggle}
               className="lg:hidden p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
             >
-              <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -75,23 +87,32 @@ export default function SidebarNav({
                   onClick={() => onSelectSession(session.id)}
                 >
                   <div className="flex-shrink-0 mt-0.5">
-                    <MessageSquare className={`w-4 h-4 ${
-                      currentSessionId === session.id ? "text-violet-400" : "text-slate-500"
-                    }`} />
+                    <MessageSquare
+                      className={`w-4 h-4 ${
+                        currentSessionId === session.id
+                          ? "text-violet-400"
+                          : "text-slate-500"
+                      }`}
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-white truncate">{session.title}</h3>
+                    <h3 className="text-sm font-medium text-white truncate">
+                      {session.title}
+                    </h3>
                     <p className="text-xs text-slate-500 truncate mt-0.5">
-                      {getChatSummary(session.messages) || "No messages yet"}
+                      {getChatSummary(session.messages, session.summary) ||
+                        "No messages yet"}
                     </p>
                     <p className="text-xs text-slate-600 mt-1">
-                      {formatDistanceToNow(session.updatedAt, { addSuffix: true })}
+                      {formatDistanceToNow(session.updatedAt, {
+                        addSuffix: true,
+                      })}
                     </p>
                   </div>
                   <button
                     onClick={(e) => {
-                      e.stopPropagation()
-                      // Add delete functionality here
+                      e.stopPropagation();
+                      onDeleteSession(session.id);
                     }}
                     className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-700/50 rounded transition-all"
                   >
@@ -125,5 +146,5 @@ export default function SidebarNav({
         ></div>
       )}
     </>
-  )
+  );
 }

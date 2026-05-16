@@ -1,12 +1,16 @@
-import type { ChatMessage, ChatSession, MessageRole } from "@/types/chat"
+import type { ChatMessage, ChatSession, MessageRole } from "@/types/chat";
 
 // Generate a unique ID
 export function generateId(): string {
-  return Math.random().toString(36).substring(2, 11)
+  return Math.random().toString(36).substring(2, 11);
 }
 
 // Create a new chat message
-export function createMessage(role: MessageRole, content: string, model?: string): ChatMessage {
+export function createMessage(
+  role: MessageRole,
+  content: string,
+  model?: string,
+): ChatMessage {
   return {
     id: generateId(),
     role,
@@ -14,7 +18,7 @@ export function createMessage(role: MessageRole, content: string, model?: string
     timestamp: new Date(),
     model,
     pending: role === "assistant",
-  }
+  };
 }
 
 // Create a new chat session
@@ -25,13 +29,18 @@ export function createChatSession(title = "New chat"): ChatSession {
     messages: [],
     createdAt: new Date(),
     updatedAt: new Date(),
-  }
+  };
 }
 
 // Mock AI response function
-export async function getMockAIResponse(message: string, model: string): Promise<string> {
+export async function getMockAIResponse(
+  message: string,
+  model: string,
+): Promise<string> {
   // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 2000))
+  await new Promise((resolve) =>
+    setTimeout(resolve, 1000 + Math.random() * 2000),
+  );
 
   const responses: Record<string, string[]> = {
     Assistant: [
@@ -52,22 +61,27 @@ export async function getMockAIResponse(message: string, model: string): Promise
       "Let me provide a comprehensive analysis of your question.",
       "I can offer several perspectives on this matter.",
     ],
-  }
+  };
 
-  const modelResponses = responses[model] || responses["Assistant"]
-  return modelResponses[Math.floor(Math.random() * modelResponses.length)]
+  const modelResponses = responses[model] || responses["Assistant"];
+  return modelResponses[Math.floor(Math.random() * modelResponses.length)];
 }
 
 // Get a summary of the chat (for sidebar display)
-export function getChatSummary(messages: ChatMessage[]): string {
-  if (messages.length === 0) return "Start a new conversation"
+export function getChatSummary(
+  messages: ChatMessage[],
+  fallback?: string,
+): string {
+  if (messages.length === 0) return fallback || "Start a new conversation";
 
-  const lastUserMessage = [...messages].reverse().find((m) => m.role === "user")
+  const lastUserMessage = [...messages]
+    .reverse()
+    .find((m) => m.role === "user");
   if (lastUserMessage) {
     return lastUserMessage.content.length > 60
       ? `${lastUserMessage.content.substring(0, 60)}...`
-      : lastUserMessage.content
+      : lastUserMessage.content;
   }
 
-  return "New conversation"
+  return fallback || "New conversation";
 }
