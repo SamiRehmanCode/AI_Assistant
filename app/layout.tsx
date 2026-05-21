@@ -3,9 +3,9 @@ import "./globals.css";
 import Providers from "@/app/providers";
 
 export const metadata: Metadata = {
-  title: "AI Assistant",
+  title: "AI Chatbot",
   description: "Your intelligent conversation partner",
-  generator: "AI Assistant",
+  generator: "AI Chatbot",
 };
 
 export default function RootLayout({

@@ -40,7 +40,7 @@ export default function SidebarNav({
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <span className="text-lg font-semibold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                AI Assistant
+                AI Chatbot
               </span>
             </div>
             <button

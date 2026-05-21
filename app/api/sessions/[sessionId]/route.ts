@@ -14,14 +14,16 @@ function isValidObjectId(id: string) {
 
 export async function GET(
   _req: Request,
-  { params }: { params: { sessionId: string } },
+  { params }: { params: Promise<{ sessionId: string }> },
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!isValidObjectId(params.sessionId)) {
+  const { sessionId } = await params;
+
+  if (!isValidObjectId(sessionId)) {
     return NextResponse.json({ error: "Invalid session" }, { status: 400 });
   }
 
@@ -33,7 +35,7 @@ export async function GET(
   }
 
   const sessionDoc = await ChatSession.findOne({
-    _id: params.sessionId,
+    _id: sessionId,
     userId: user._id,
   }).lean();
 
@@ -92,14 +94,16 @@ export async function GET(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { sessionId: string } },
+  { params }: { params: Promise<{ sessionId: string }> },
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!isValidObjectId(params.sessionId)) {
+  const { sessionId } = await params;
+
+  if (!isValidObjectId(sessionId)) {
     return NextResponse.json({ error: "Invalid session" }, { status: 400 });
   }
 
@@ -111,7 +115,7 @@ export async function DELETE(
   }
 
   const sessionDoc = await ChatSession.findOne({
-    _id: params.sessionId,
+    _id: sessionId,
     userId: user._id,
   }).lean();
 

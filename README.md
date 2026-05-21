@@ -1,119 +1,104 @@
 
-# AI Assistant
+# AI Chatbot
 
-AI Assistant is a web-based chat application that allows users to interact with AI models like OpenAI's GPT. It provides a clean and intuitive interface for managing chat sessions, switching between AI models, and sending messages.
+AI Chatbot is a web-based chat application that uses server-side calls to large language models (OpenAI) and MongoDB for persistence. It supports user sign-in via Google (NextAuth), session management, per-message feedback, analytics dashboards, and automatic topic tagging.
+
+**Important:** **This project requires a ChatGPT / OpenAI API key.** **API keys expire at the end of each month — make sure you renew or replace the key monthly.**
 
 ## Features
 
-- **Chat Sessions**: Create, manage, and delete chat sessions.
-- **AI Models**: Switch between different AI models (e.g., GPT-3.5-turbo).
-- **Real-Time Responses**: Get AI-generated responses in real-time.
-- **Sidebar Navigation**: Toggle a sidebar to view and manage chat sessions.
-- **Customizable Prompts**: Send custom user inputs to the AI.
+- Chat sessions with persistent messages
+- Model selection and server-side LLM calls
+- Feedback collection (rating, correctness, length) per message
+- Automatic topic tagging for replies
+- Analytics dashboard with topic and positional metrics
+- Google OAuth sign-in (NextAuth)
 
-## Project Structure
+## Quick Start
 
+1. Clone the repo:
+
+```bash
+git clone https://github.com/SamiRehmanCode/AI_Assistant.git
+cd AI_Assistant
 ```
-.env
-.gitignore
-components.json
-next-env.d.ts
-next.config.mjs
-package.json
-pnpm-lock.yaml
-postcss.config.mjs
-tailwind.config.ts
-tsconfig.json
-.next/
-app/
-components/
-hooks/
-lib/
-public/
-styles/
-types/
-```
-
-### Key Files
-
-- **`hooks/use-chat-store.ts`**: Contains the main logic for managing chat sessions and interacting with the AI.
-- **`lib/chat-utils.ts`**: Utility functions for creating chat sessions and messages.
-- **`components/`**: Reusable UI components like `chat-input`, `chat-history`, and `bot-selector`.
-
-## Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/SamiRehmanCode/AI_Assistant.git
-   cd AI_Assistant
-   ```
 
 2. Install dependencies:
 
-   ```bash
-   pnpm install
-   ```
+```bash
+pnpm install
+```
 
-3. Create a `.env` file in the root directory and add your OpenAI API key:
+3. Create a local `.env` (see Environment Variables below) and populate secrets. Do NOT commit secrets to source control.
 
-   ```env
-   OPENAI_API_KEY=your-openai-api-key
-   ```
+4. Start dev server:
 
-4. Start the development server:
+```bash
+pnpm dev
+```
 
-   ```bash
-   pnpm dev
-   ```
-
-5. Open the app in your browser at `http://localhost:3000`.
-
-## Usage
-
-1. Open the app in your browser.
-2. Create a new chat session or select an existing one from the sidebar.
-3. Type your message in the input box and press Enter to send it.
-4. Switch between AI models using the model selector.
+5. Open `http://localhost:3000`.
 
 ## Environment Variables
 
-The following environment variables are required:
+Set the following environment variables for local development or in your hosting provider's secret manager:
 
-- `OPENAI_API_KEY`: Your OpenAI API key for accessing GPT models.
+- `MONGODB_URI` — MongoDB connection string (server-side). Example:
+  `mongodb+srv://<user>:<password>@cluster0.example.mongodb.net/mydbname?retryWrites=true&w=majority`
+- `OPENAI_API_KEY` — OpenAI / ChatGPT API key (server-only). **Required; note: keys expire monthly.**
+- `GOOGLE_CLIENT_ID` — Google OAuth client ID for NextAuth
+- `GOOGLE_CLIENT_SECRET` — Google OAuth client secret for NextAuth
+- `NEXTAUTH_SECRET` — Secret used by NextAuth for signing
+- `NEXTAUTH_URL` — (Optional) production URL, e.g. `https://yourdomain.com` — defaults to `http://localhost:3000` for local dev
+- `TOPIC_TAGGER_MODEL` — (Optional) model id used for topic tagging (default: `gpt-4o-mini`)
 
-## Scripts
+Example `.env` (do not include real secrets):
 
-- `pnpm dev`: Start the development server.
-- `pnpm build`: Build the project for production.
-- `pnpm start`: Start the production server.
-- `pnpm lint`: Run linting checks.
+```
+MONGODB_URI=
+OPENAI_API_KEY=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=http://localhost:3000
+TOPIC_TAGGER_MODEL=gpt-4o-mini
+```
 
-## Technologies Used
+## Running & Development Notes
 
-- **Next.js**: Framework for building the application.
-- **React**: Frontend library for building UI components.
-- **Tailwind CSS**: Utility-first CSS framework for styling.
-- **OpenAI API**: For AI-generated responses.
+- Make sure you run `pnpm install` after pulling changes.
+- Keep secrets server-side (do not expose as `NEXT_PUBLIC_*`).
+- If you see TypeScript import errors for `next-auth`, run:
 
-## Security
+```bash
+pnpm add next-auth
+pnpm add -D @types/next-auth
+```
 
-This project uses OpenAI's API key for accessing GPT models. Ensure that your API key is kept secure and not exposed in the client-side code. Use environment variables to manage sensitive information.
+## Key Rotation & Security
+
+- If a key is accidentally exposed, revoke it immediately from the provider dashboard and generate a new key.
+- The ChatGPT/OpenAI API key used by this project is rotated/issued monthly in your setup — plan to update the `OPENAI_API_KEY` before month-end to avoid service interruption.
+
+## Project Structure (high level)
+
+- `app/` — Next.js app router pages and API routes
+- `components/` — React UI components (chat, analytics, feedback)
+- `lib/` — server utilities (db connection, models, OpenAI wrapper, topic tagging)
+- `hooks/` — client hooks (chat store)
+- `types/` — TypeScript types
+
+## Troubleshooting
+
+- `Cannot find module 'next-auth/react'` — install `next-auth` and types as above.
+- `Route used params is a Promise` — Next.js app router requires awaiting dynamic `params` in API routes; see `app/api/*/route.ts` handlers.
 
 ## Contributing
 
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix.
-3. Commit your changes and push them to your fork.
-4. Submit a pull request.
+- Fork, branch, commit, and open a PR. Keep changes minimal and focused.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+MIT
 
----
-
-**Note**: If you accidentally exposed your OpenAI API key, make sure to revoke it immediately and replace it with a new one.
 ```
